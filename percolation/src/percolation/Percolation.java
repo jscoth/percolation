@@ -7,6 +7,7 @@ public class Percolation {
 	private int size;	  // width of 1 row on the square grid
 	private int endpoint; // the array position of the virtual node at the bottom of the grid
 	private WeightedQuickUnionUF grid;
+	private boolean[] open;
 	
 	public Percolation (int n) {
 		size = n;
@@ -15,6 +16,7 @@ public class Percolation {
 		// system contains two virtual nodes, one at the top and one at the bottom
 		// therefore size is n^2 + 2
 		 grid = new WeightedQuickUnionUF((n*n)+2);
+		 open = new boolean[(n*n)+2];
 		 
 		 // the top virtual node is connected to the first row, which is all sites from 1 to n:
 		 for (int i = 1; i < n + 1; i++)
@@ -37,6 +39,7 @@ public class Percolation {
 	public void open(int i, int j) {
 
 		int currentSite = ConvertXY(i, j);	
+		open[currentSite] = true;
 		// not on top row
 		if (currentSite > size) {
 			grid.union(currentSite, currentSite - size);// north
@@ -61,27 +64,11 @@ public class Percolation {
 	}
 	
 	public boolean isOpen(int i, int j) {
-		int currentSite = ConvertXY(i, j);
-		
-		Boolean north,east,west,south;
-		north = south = east = west = true;
-		
-		// not on top row
-		if (currentSite > size)
-			north = grid.connected(currentSite, currentSite - size);	// north
-		// not on right side
-		if (currentSite % size != 0)
-			east = grid.connected(currentSite, currentSite + 1); 		// east
-		//not on left side
-		if ((currentSite % size) != 1)
-			west = grid.connected(currentSite, currentSite - 1); 		// west
-		// not on bottom row
-		if (currentSite < endpoint - size -1)
-			south = grid.connected(currentSite, currentSite + size); 	// south
-		
-		return north && east && west && south;
+
+		return open[ConvertXY(i, j)];
 	}
 	
+
 	public boolean isFull(int i, int j) {
 		if (isOpen(i, j))
 			return grid.connected(0, ConvertXY(i,j));
@@ -103,14 +90,12 @@ public class Percolation {
 		return (x + (y * size) + 1);
 	}
 	
-//	public static void main(String[] args) {
-//		Percolation p = new Percolation(3);
-//		p.open(1,1);
-//		//p.open(1,1);
-//		//p.open(1,1);
-//		
-//		System.out.println(p.percolates());
-//		
-//		
-//	}
+	public static void main(String[] args) {
+		Percolation p = new Percolation(3);
+
+		
+		System.out.println(p.percolates());
+		
+		
+	}
 }
