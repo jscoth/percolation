@@ -18,13 +18,13 @@ public class Percolation {
 		 grid = new WeightedQuickUnionUF((n*n)+2);
 		 open = new boolean[(n*n)+2];
 		 
-		 // the top virtual node is connected to the first row, which is all sites from 1 to n:
-		 for (int i = 1; i < n + 1; i++)
-		 {
-			 System.out.println("DEBUG: union: 0 and " + i );
-			 grid.union(0, i);
-		 }
-	
+//		 // the top virtual node is connected to the first row, which is all sites from 1 to n:
+//		 for (int i = 1; i < n + 1; i++)
+//		 {
+//			 System.out.println("DEBUG: union: 0 and " + i );
+//			 grid.union(0, i);
+//		 }
+//	
 		 // the bottom virtual node is connected to the bottom row, which is 
 		 // all sites from (n^2)-n+1 to (n^2)+1
 		 for (int i = (n*n)-n+1; i < endpoint; i++)
@@ -45,20 +45,21 @@ public class Percolation {
 			grid.union(currentSite, currentSite - size);// north
 			System.out.println("connected " + currentSite  +" and " + (currentSite - size) );
 		}
+		// else if it is on top row, connect to virtual node
+		else
+		{
+			grid.union(currentSite, 0);
+		}
+		
 		// not on right side
-		if (currentSite % size != 0) {
+		if (currentSite % size != 0 && isOpen(i,j+1)) {
 			grid.union(currentSite, currentSite + 1); 	// east
-			System.out.println("connected " + currentSite  +" and " + (currentSite +1) );
+			System.out.println("connected horizontally " + currentSite  +" and " + (currentSite +1) );
 		}
 		//not on left side
-		if ((currentSite % size) != 1) {
+		if ((currentSite % size) != 1 && isOpen(i,j-1)) {
 			grid.union(currentSite, currentSite - 1); 	// west
 			System.out.println("connected " + currentSite + " and " + (currentSite - 1) );
-		}
-		// not on bottom row
-		if (currentSite < endpoint - size -1) {
-			grid.union(currentSite, currentSite + size); 	// south
-			System.out.println("connected " + currentSite  +" and " + (currentSite + size) );
 		}
 
 	}
@@ -78,14 +79,14 @@ public class Percolation {
 	}
 	
 	public boolean percolates() {
-		return grid.connected(0, endpoint);
+		return grid.connected(0, ((size*size)+1));
 	}
 	
 	/*
 	 * Converts x,y coordinates for use on a 1 dimensional array representing
 	 * the same area
 	 */
-	private int ConvertXY(int x, int y)
+	private int ConvertXY(int y, int x)
 	{
 		return (x + (y * size) + 1);
 	}
